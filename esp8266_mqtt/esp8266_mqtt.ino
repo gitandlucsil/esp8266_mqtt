@@ -4,6 +4,7 @@
 
 const char* ssid = "";
 const char* senha = "";
+const byte LED = 2;
 
 WiFiServer server(80);
 
@@ -38,7 +39,7 @@ void setup()
     Serial.println("Servidor inicializado");
   }
 }
-
+int cont = 0;
 void loop() 
 {
   WiFiClient client = server.available();
@@ -54,7 +55,10 @@ void loop()
   client.println("");
   client.println("<!DOCTYPE HTML>");
   client.println("<html>");
+  client.println("<meta http-equiv='refresh' content='2'>");
   client.println("<h1>Curso controle dispositivos remotamente com ESP8266</h1>");
   client.println("<h2>Ola Makers!</h2>");
+  client.println(cont);
   client.println("</html>"); 
+  cont++;
 }
