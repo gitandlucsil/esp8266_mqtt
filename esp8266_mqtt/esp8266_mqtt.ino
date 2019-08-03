@@ -1,21 +1,28 @@
-const byte LED_1 = 2; //Pino do LED do NodeMCU
-const byte LED_2 = 16; //Pino do LED do NodeMCU
-const byte LED_EXT_1 = D1; //Pino de LED externo na saida digital
+#include <ESP8266WiFi.h>
+
+const char* ssid = "";
+const char* senha = "";
+
 void setup() 
 {
-  pinMode(LED_1,OUTPUT);
-  pinMode(LED_2,OUTPUT);
-  pinMode(LED_EXT_1,OUTPUT);
+  Serial.begin(115200);
+  delay(10);
+  Serial.print("Conectando a rede ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid,senha);
+  while(WiFi.status() != WL_CONNECTED){
+      delay(500);
+      Serial.print(".");
+  }
+  Serial.print("Conectado a rede ");
+  Serial.print(ssid);
+  Serial.println("!");
+  Serial.print("Endereço de IP: ");
+  Serial.println(WiFi.localIP());
 }
 
 void loop() 
 {
-  digitalWrite(LED_1,LOW);//Acender o LED
-  digitalWrite(LED_2,HIGH);//Apagar o LED
-  digitalWrite(LED_EXT_1,HIGH);//Acender o LED
-  delay(1000);
-  digitalWrite(LED_1,HIGH);//Apagar o LED
-  digitalWrite(LED_2,LOW);//Acender o LED
-  digitalWrite(LED_EXT_1,LOW);//Acender o LED
-  delay(1000);
+
 }
