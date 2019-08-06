@@ -13,7 +13,8 @@ const char* senha = "";
 const char* mqttServer = "";
 const char* mqttUser = "";
 const char* mqttPassword = "";
-const char* mqttTopicSub = "";
+const char* mqttTopicSub1 = "";
+const char* mqttTopicSub2 = "";
 const int mqttPort = ;
 
 WiFiClient espClient;
@@ -73,8 +74,9 @@ void setup()
       delay(2000);
     }
   }
-  //subscreve no tópico
-  client.subscribe(mqttTopicSub);
+  //subscreve nos tópicos
+  client.subscribe(mqttTopicSub1);
+  client.subscribe(mqttTopicSub2);
 }
 void callback(char* topic, byte* payload, unsigned int length) {
 
@@ -82,20 +84,28 @@ void callback(char* topic, byte* payload, unsigned int length) {
   payload[length] = '\0';
   String strMSG = String((char*)payload);
 
-  #ifdef DEBUG
+#ifdef DEBUG
   Serial.print("Mensagem chegou do tópico: ");
   Serial.println(topic);
   Serial.print("Mensagem:");
   Serial.print(strMSG);
   Serial.println();
   Serial.println("-----------------------");
-  #endif
+#endif
 
-  //aciona saída conforme msg recebida 
-  if (strMSG == "1"){         //se msg "1"
-     digitalWrite(LED_1, LOW);  //coloca saída em LOW para ligar a Lampada - > o módulo RELE usado tem acionamento invertido. Se necessário ajuste para o seu modulo
-  }else if (strMSG == "0"){   //se msg "0"
-     digitalWrite(LED_1, HIGH);   //coloca saída em HIGH para desligar a Lampada - > o módulo RELE usado tem acionamento invertido. Se necessário ajuste para o seu modulo
+  //aciona saída conforme msg recebida
+  if (String(topic) == "board/led1") {
+    if (strMSG == "1") {        //se msg "1"
+      digitalWrite(LED_1, LOW);  //coloca saída em LOW para ligar a Lampada - > o módulo RELE usado tem acionamento invertido. Se necessário ajuste para o seu modulo
+    } else if (strMSG == "0") {  //se msg "0"
+      digitalWrite(LED_1, HIGH);   //coloca saída em HIGH para desligar a Lampada - > o módulo RELE usado tem acionamento invertido. Se necessário ajuste para o seu modulo
+    }
+  } else if (String(topic) == "board/led2") {
+    if (strMSG == "1") {        //se msg "1"
+      digitalWrite(LED_2, LOW);  //coloca saída em LOW para ligar a Lampada - > o módulo RELE usado tem acionamento invertido. Se necessário ajuste para o seu modulo
+    } else if (strMSG == "0") {  //se msg "0"
+      digitalWrite(LED_2, HIGH);   //coloca saída em HIGH para desligar a Lampada - > o módulo RELE usado tem acionamento invertido. Se necessário ajuste para o seu modulo
+    }
   }
 }
 
@@ -103,27 +113,28 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void reconect() {
   //Enquanto estiver desconectado
   while (!client.connected()) {
-    #ifdef DEBUG
+#ifdef DEBUG
     Serial.print("Tentando conectar ao servidor MQTT");
-    #endif
-     
+#endif
+
     bool conectado = strlen(mqttUser) > 0 ?
                      client.connect("cursoESP8266MQTT", mqttUser, mqttPassword) :
                      client.connect("cursoESP8266MQTT");
 
-    if(conectado) {
-      #ifdef DEBUG
+    if (conectado) {
+#ifdef DEBUG
       Serial.println("Conectado!");
-      #endif
+#endif
       //subscreve no tópico
-      client.subscribe(mqttTopicSub, 1); //nivel de qualidade: QoS 1
+      client.subscribe(mqttTopicSub1, 1); //nivel de qualidade: QoS 1
+      client.subscribe(mqttTopicSub2, 2); //nivel de qualidade: QoS 2
     } else {
-      #ifdef DEBUG
+#ifdef DEBUG
       Serial.println("Falha durante a conexão.Code: ");
       Serial.println( String(client.state()).c_str());
       Serial.println("Tentando novamente em 10 s");
-      #endif
-      //Aguarda 10 segundos 
+#endif
+      //Aguarda 10 segundos
       delay(10000);
     }
   }
