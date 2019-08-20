@@ -68,14 +68,17 @@ void reconect() {
   }
 }
 
-void enviatDHT11MQTT(int valor_umidade,int valor_temperatura,const char *topico_umidade,const char *topico_temperatura)
+void enviatDHT11MQTT(int valor_umidade,int valor_temperatura,const char *topico)
 {
-    char MsgUmidadeMQTT[10];
-    char MsgTemperaturaMQTT[10];
-    sprintf(MsgUmidadeMQTT,"%d",valor_umidade);
-    client.publish(topico_umidade,MsgUmidadeMQTT);
-    sprintf(MsgTemperaturaMQTT,"%d",valor_temperatura);
-    client.publish(topico_temperatura,MsgTemperaturaMQTT);
+    //Monta o json
+    String json = "{";
+    json += "\"umidade\":";
+    json += valor_umidade;
+    json += ",\"temperatura\":";
+    json += valor_temperatura;
+    json += "}";
+    //Publica no topico
+    client.publish(topico,json.c_str());
 }
 void setup()
 {
@@ -93,11 +96,11 @@ void loop()
   }
   if((millis() - ultimoEnvioMQTT) > INTERVALO_ENVIO){
     lerDHT11(&umidade,&temperatura,1);
-    enviatDHT11MQTT(umidade,temperatura,TOPICO_UMIDADE_1,TOPICO_TEMPERATURA_1);
+    enviatDHT11MQTT(umidade,temperatura,TOPICO_DHT11_1);
     lerDHT11(&umidade,&temperatura,2);
-    enviatDHT11MQTT(umidade,temperatura,TOPICO_UMIDADE_2,TOPICO_TEMPERATURA_2);
+    enviatDHT11MQTT(umidade,temperatura,TOPICO_DHT11_2);
     lerDHT11(&umidade,&temperatura,3);
-    enviatDHT11MQTT(umidade,temperatura,TOPICO_UMIDADE_3,TOPICO_TEMPERATURA_3);
+    enviatDHT11MQTT(umidade,temperatura,TOPICO_DHT11_3);
     ultimoEnvioMQTT = millis();
   }
   client.loop();
